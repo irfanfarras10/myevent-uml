@@ -1,0 +1,94 @@
+@startuml "sequence_diagram_masuk"
+
+    title "Masuk"
+    hide footbox
+    skinparam  shadowing false
+
+    skinparam sequence {    
+        ArrowThickness 1.5
+        ActorFontName Century Gothic
+        ActorBackgroundColor  #C6EFFC
+        ArrowFontName Century Gothic
+        ParticipantBorderThickness 1.5
+        ParticipantBackgroundColor #C6EFFC
+    }
+
+    ' frontend component 
+    actor "Penyelenggara Event" as eo 
+    participant "__:SignInScreen__" as view1
+    participant "__:AuthController__" as controller1
+    participant "__:SignInApiResponse__" as model1
+    participant "__:SharedPreferences__" as prefs
+    participant "__:ApiAuth__" as util1
+    participant "__:ApiUtil__" as util2
+    ' backend component
+    participant "__:UserController__" as controller2
+    participant "__:UserService__" as service1
+    participant "__:JwtTokenUtil__" as util3
+    participant "__:Jwts__" as util4
+ 
+    loop #6fd0f6 username atau password tidak valid
+        eo -> view1: Memasukkan username
+        activate eo
+        activate view1
+        view1 -> controller1: .validateUsername()
+        activate controller1
+        alt username tidak valid
+            controller1 --> view1: usernameErrorMessasge
+            view1 --> eo: Menampilkan pesan error username tidak valid
+        end
+        eo -> view1: Memasukkan password
+        view1 -> controller1: .validatePassword()
+        alt password tidak valid
+            controller1 --> view1: passwordErrorMessage
+            view1 --> eo: Menampilkan pesan error password tidak valid
+        end
+    end 
+    eo -> view1: Menekan tombol masuk
+    view1 -> controller1: .signIn()
+    controller1 -> util1: .signIn(requestBody)
+    activate util1
+    util1 -> util2: .apiRequestPost(requestBody)
+    activate util2
+
+    alt #6fd0f6 kredensial tidak cocok
+        util2 -> controller2: .authenticate(username, password)
+        activate controller2
+        controller2 --> util2: JSON API response
+        util2 --> util1: response
+        util1 --> controller1: response
+        controller1 --> view1: errorMessage
+        view1 --> eo: Menampilkan pesan error kredensial
+    else kredensial cocok
+        controller2 -> service1: .loadByUsername(username)
+        activate service1
+        service1 --> controller2: UserAuthDto
+        deactivate
+        controller2 -> util3: .generateToken(userAuthDto)
+        activate util3
+        util3 --> util4: .builder()
+        activate util4
+        util4 --> util3: String  
+        deactivate
+        util3 --> controller2: String
+        deactivate
+        controller2 --> util2: JSON API respon
+         deactivate
+        util2 --> util1: response
+        deactivate
+        util1 --> controller1: response
+        deactivate
+        controller1 -> model1: .fromJson(apiResponse)
+        activate model1
+        model1 --> controller1: SignInApiResponse
+        deactivate
+        controller1 -> prefs: .setAuthToken(token)
+        activate prefs
+        deactivate
+        controller1 --> view1: dispose
+        deactivate
+        view1 --> eo: Menampilkan halaman utama
+        deactivate
+    end
+
+@enduml

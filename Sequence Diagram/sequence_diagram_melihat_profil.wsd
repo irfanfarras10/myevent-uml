@@ -1,0 +1,76 @@
+@startuml sequence_diagram_melihat_profil
+
+    title "Melihat Profil"
+    hide footbox
+    skinparam shadowing false
+    skinparam sequence {    
+        ArrowThickness 1.5
+        ActorFontName Century Gothic
+        ActorBackgroundColor  #C6EFFC
+        ArrowFontName Century Gothic
+        ParticipantBorderThickness 1.5
+        ParticipantBackgroundColor #C6EFFC
+    }
+
+    ' frontend component
+    actor "Penyelenggara Event" as eo   
+    participant "__:ProfileScreen__" as viewProfile
+    participant "__:ProfileController__" as controllerProfile
+    participant "__:ViewProfileApiResponse__" as modelProfile 
+    participant "__:ApiProfile__" as apiProfile
+    participant "__:ApiUtil__" as apiUtil
+    
+    ' backend component
+    participant "__:EventOrganizerController__" as controllerEventOrganizer
+    participant "__:EventOrganizerService__" as serviceEventOrganizer
+    participant "__:EventOrganizerRepository__" as repositoryEventOrganizer
+ 
+    eo -> viewProfile: Mengklik menu profil
+    activate eo
+    activate viewProfile
+    
+    viewProfile -> controllerProfile: .loadData()    
+    activate controllerProfile
+
+    controllerProfile -> apiProfile: .viewProfile()
+    activate apiProfile
+
+    apiProfile -> apiUtil: .apiRequestGet()
+    activate apiUtil
+
+    apiUtil -> controllerEventOrganizer: .getProfile()
+    activate controllerEventOrganizer
+
+    controllerEventOrganizer -> serviceEventOrganizer: .viewProfile()
+    activate serviceEventOrganizer
+
+    serviceEventOrganizer -> repositoryEventOrganizer: .findById(userId)
+    activate repositoryEventOrganizer
+
+    repositoryEventOrganizer --> serviceEventOrganizer: EventOrganizerDao
+    deactivate
+
+    serviceEventOrganizer --> controllerEventOrganizer: EventOrganizerDao
+    deactivate
+
+    controllerEventOrganizer --> apiUtil: JSON API Response
+    deactivate
+
+    apiUtil --> apiProfile: response.data
+    deactivate
+    
+    apiProfile --> controllerProfile: response.data
+    deactivate
+    
+    controllerProfile --> modelProfile: .fromJson(response)
+    activate modelProfile
+
+    modelProfile --> controllerProfile: ViewProfileApiResponse
+    deactivate 
+
+    controllerProfile --> viewProfile: ProfileScreen
+    deactivate 
+
+    viewProfile --> eo: Menampilkan halaman profil
+    deactivate
+@enduml

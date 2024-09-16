@@ -1,0 +1,46 @@
+@startuml "sequence_diagram_masuk"
+
+    title "Keluar"
+    hide footbox
+    skinparam  shadowing false
+    skinparam sequence {    
+        ArrowThickness 1.5
+        ActorFontName Century Gothic
+        ActorBackgroundColor  #C6EFFC
+        ArrowFontName Century Gothic
+        ParticipantBorderThickness 1.5
+        ParticipantBackgroundColor #C6EFFC
+    }
+
+    ' frontend component
+    actor "Penyelenggara Event" as eo   
+    participant "__:EventListScreen__" as view1
+    participant "__:AuthController__" as controller1
+    participant "__:SharedPreferences__" as prefs
+    
+    eo -> view1: Membuka menu navigasi
+    activate eo
+    activate view1
+    view1 --> eo: Menampilkan menu navigasi
+    eo -> view1: Menekan tombol keluar
+    view1 -> eo: Menampilkan dialog konfirmasi keluar
+    alt #6fd0f6 menekan tombol ya
+        eo -> view1: Menekan tombol ya
+        view1 -> controller1: .logout()
+        activate controller1
+        controller1 -> prefs: .remove(token)
+        activate prefs
+        controller1 --> view1: dispose
+        deactivate 
+        view1 --> eo: Menampilkan halaman masuk
+    else menekah tombol tidak
+        eo -> view1: Menekan tombol tidak
+        view1 -> controller1: .back()
+        controller1 --> view1: dispose
+        deactivate
+        view1 --> eo: Menutup dialog konfirmasi keluar
+        deactivate
+    end
+    
+    
+@enduml

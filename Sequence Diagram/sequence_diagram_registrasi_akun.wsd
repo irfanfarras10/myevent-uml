@@ -1,0 +1,110 @@
+@startuml "sequence_diagram_registrasi_akun"
+
+    title "Registrasi Akun"
+    hide footbox
+    skinparam  shadowing false
+
+    skinparam sequence {    
+        ArrowThickness 1.5
+        ActorFontName Century Gothic
+        ActorBackgroundColor  #C6EFFC
+        ArrowFontName Century Gothic
+        ParticipantBorderThickness 1.5
+        ParticipantBackgroundColor #C6EFFC
+    }
+
+    ' frontend component
+    actor "Penyelenggara Event" as eo
+    participant "__:SignUpScreen__" as view1
+    participant "__:AuthController__" as controller1
+    participant "__:SignUpApiRequest__" as model1
+    participant "__:ApiAuth__" as util1
+    participant "__:ApiUtil__" as util2
+    ' backend component
+    participant "__:UserController__" as controller2
+    participant "__:UserService__" as service1
+    participant "__:UserRepositiry__" as repository1
+ 
+    loop #6fd0f6  data tidak valid
+        eo -> view1: Membuka halaman registrasi
+        activate eo
+        activate view1
+        view1 --> eo: Menampilkan halaman registrasi
+        eo -> view1: Memasukkan data username
+        view1 -> controller1: .validateUsername()
+        activate controller1
+        alt #C6EFFC username tidak valid
+            controller1 --> view1: usernameErrorMessage
+            view1 --> eo: Menampilkan pesan error username
+        end
+        eo -> view1: Memasukkan data nama event organizer
+        view1 -> controller1: .validateOrganizerName()
+        alt #C6EFFC nama event organizer tidak valid
+            controller1 --> view1: organizerNameErrorMessage
+            view1 --> eo: Menampilkan pesan error nama event organizer
+        end
+        eo -> view1: Memasukkan data e-mail
+        view1 -> controller1: .validateEmail()
+        alt #C6EFFC e-mail tidak valid
+            controller1 --> view1: emailErrorMessage
+            view1 --> eo: Menampilkan pesan error e-mail
+        end
+        eo -> view1: Memasukkan data password
+        view1 -> controller1: .validatePassword()
+        alt #C6EFFC password tidak valid
+            controller1 --> view1: passwordErrorMessage
+            view1 --> eo: Menampilkan pesan error password
+        end
+        eo -> view1: Memasukkan data nomor telepon
+        view1 -> controller1: .validatePhoneNumber()
+        alt #C6EFFC nomor telepon tidak valid
+            controller1 --> view1: phoneNumberErrorMessage
+            view1 --> eo: Menampilkan pesan error nomor telepon
+        end
+    end 
+    eo -> view1: Mengklik tombol daftar
+    view1 -> controller1: .signUp()
+    controller1 -> model1: membuat objek
+    activate model1
+    model1 --> controller1: SignUpApiRequest
+    deactivate model1
+    controller1 -> util1: .signUp(signUpApiRequest)
+    activate util1
+    util1 -> util2: .signUp(requestBody)
+    activate util2
+
+    util2 -> controller2: Meminta repson
+    activate controller2
+    controller2 -> service1: .insert(signUpApiRequest)
+    activate service1
+    service1 -> repository1: .save(newUser)
+    activate repository1
+    alt #6fd0f6 registrasi berhasil
+        repository1 --> service1: UserDao
+        service1 --> controller2: UserDao
+        controller2 --> util2: JSON API response
+        util2 --> util1: response
+        util1 --> controller1: response
+        controller1 --> view1: message
+        view1 --> eo: Menampilkan pesan registrasi berhasil
+        eo -> view1: Menekan tombol OK
+        view1 -> controller1: .ofAllNamed(RouteName.signInScreen)
+        view1 --> eo: Menampilkan halaman masuk
+      
+    else registrasi gagal
+        repository1 --> service1: UserDao
+        deactivate
+        service1 --> controller2: UserDao
+        deactivate
+        controller2 --> util2: JSON API response
+        deactivate
+        util2 --> util1: response
+        deactivate
+        util1 --> controller1: response
+        deactivate
+        controller1 --> view1: errorMessage
+        deactivate
+        view1 --> eo: Menampilkan pesan registrasi gagal    
+    end 
+
+@enduml
