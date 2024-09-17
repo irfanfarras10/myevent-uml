@@ -1,0 +1,94 @@
+@startuml "myevent_activity_diagram"
+    left to right direction
+
+    actor "Penyelenggara Event" as eo
+    actor "Peserta Event" as peserta
+
+    rectangle MyEvent {
+        ' use case Penyelenggara Event
+        usecase "Registrasi Akun" as UC1
+        usecase "Masuk" as UC2
+        usecase "Keluar" as UC3
+        usecase "Mengubah Profil" as UC4
+        usecase "Melihat Profil" as UC5
+        usecase "Melihat Dasbor Event" as UC6
+        usecase "Melihat Daftar Event" as UC7
+        usecase "Mencari Data Event" as UC8
+        usecase "Melihat Agenda" as UC9
+        usecase "Melihat Laporan Data Peserta" as UC10
+        usecase "Melihat Laporan Data Umpan Balik" as UC11
+        usecase "Mengelola Data Event" as UC12
+        usecase "Mempublikasikan Event" as UC13
+        usecase "Membatalkan Event" as UC14
+        usecase "Membagikan Informasi Event ke Media Sosial" as UC15
+        usecase "Mengunduh File Jadwal Kalendar" as UC16
+        usecase "Impor Jadwal Ke Google Calendar" as UC17
+        usecase "Melihat Data Peserta" as UC18
+        usecase "Melihat Daftar Peserta" as UC19
+        usecase "Mencari Daftar Peserta" as UC20
+        usecase "Mengelola Data Tamu Undangan" as UC21
+        usecase "Mengundang Tamu Undangan" as UC22
+        usecase "Mengelola Data Tiket" as UC23
+        usecase "Membagikan File ke Semua Peserta" as UC24
+        usecase "Membagikan File ke Peserta Tertentu" as UC25
+        usecase "Membagikan Sertifikat" as UC26
+        usecase "Membagikan Kuesioner Umpan Balik" as UC27
+        usecase "Melihat Daftar Pembayaran" as UC28
+        usecase "Melihat Detail Pembayaran" as UC29
+        usecase "Konfirmasi Pembayaran" as UC30
+        ' use case peserta event
+        usecase "Registrasi Event" as UC31
+        usecase "Melihat Formulir Registrasi" as UC32
+        usecase "Melihat Informasi Event" as UC33
+        usecase "Mengisi Formulir Presensi" as UC34
+        usecase "Melihat Formulir Presensi" as UC35
+        usecase "Mengisi Kuesioner Umpan Balik" as UC36
+        usecase "Melihat Kuesioner Umpan Balik" as UC37
+        usecase "Melihat Sertifikat" as UC38
+        usecase "Mengunduh Sertifikat" as UC39
+     }
+
+    ' penyelenggara event
+    eo -- UC1
+    eo -- UC2
+    eo -- UC3
+    eo -- UC4
+    UC4 ..> UC5 :<<include>>
+    eo -- UC6
+    UC6 ..> UC7 :<<include>>
+    UC7 <.. UC8 :<<extend>>
+    eo -- UC9
+    eo -- UC10
+    eo -- UC11
+    eo -- UC12 
+    eo -- UC13
+    eo -- UC14
+    eo -- UC15
+    eo -- UC16 
+    UC16 <.. UC17 :<<extend>>
+    eo -- UC18
+    UC18 ..> UC19 :<<include>>
+    UC19 <.. UC20 :<<extend>>
+    eo -- UC21
+    eo -- UC22
+    eo -- UC23
+    eo -- UC24
+    eo -- UC25
+    eo -- UC26
+    eo -- UC27
+    eo -- UC30
+    UC30 ..> UC29 :<<include>>
+    UC29 ..> UC28 :<<include>>
+
+    ' peserta event
+    peserta -- UC31
+    UC31 ..> UC32 :<<include>>
+    peserta -- UC33
+    peserta -- UC34
+    UC34 ..> UC35 :<<include>>
+    peserta -- UC16
+    peserta -- UC36
+    UC36 ..> UC37 :<<include>>
+    peserta -- UC38
+    UC38 ..> UC39 :<<include>>
+@enduml
