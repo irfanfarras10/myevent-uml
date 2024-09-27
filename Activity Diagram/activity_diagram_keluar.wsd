@@ -1,0 +1,21 @@
+@startuml "activity_diagram_keluar"
+
+title "Keluar"
+
+|Penyelenggara Event|
+    start
+    :Membuka menu navigasi;
+|Sistem|
+    :Menampilkan menu navigasi;
+|Penyelenggara Event|
+    :Menekan tombol keluar;
+|Sistem|
+    :Menampilkan dialog konfirmasi;
+    if () then (Menekan tombol ya)
+        end 
+    else (Menekan tombol tidak)
+        :Menghapus data token autentikasi;
+        :Mengarahkan ke halaman masuk;
+        stop
+
+@enduml
